@@ -1,0 +1,3 @@
+# Every path: the org owner. Committed now as the one-toggle path to required-review
+# when external contributors arrive (rulesets today gate force-push/deletion/tags).
+* @notgeorge
