@@ -6,8 +6,10 @@
 # (boto3) rides with THIS distribution and never enters TAP core; TAP resolves a secret's
 # value from AWS Secrets Manager only when this distribution is installed AND allow-listed
 # (tap.secret_sources trust gate). Bootstrap-tier: public and secret-free, so it installs
-# before any secret-gated plugin (req-plugin-depres-bootstrap-1). For the CI lanes it is
-# simply preinstalled into the CodeBuild image (Decision B).
+# before any secret-gated plugin (req-plugin-depres-bootstrap-1). When a CI lane needs to
+# resolve a secret, this distribution is preinstalled into that lane's image (Decision B) —
+# but there is no live CI consumer today: the plugin repos are public, so no lane resolves a
+# secret, and this preinstall wiring is dormant until a secret-gated consumer returns.
 [project]
 name = "aws-secrets-source"
 version = "0.1.0"
