@@ -1,0 +1,38 @@
+# CI for tap-build-dependencies.
+#
+# This repo is NOT a grid plugin, so it does not call core's reusable plugin-ci.yml
+# (that gate is Django-structure validation against a core harness). It ships bootstrap-
+# tier secret-source PROVIDERS — today aws_secrets_source, a `tap.secret_sources`
+# provider that keeps boto3 out of TAP core — each a standalone Python distribution with
+# its own unit suite. This workflow runs those suites on push/PR so a provider change is
+# gated HERE (nothing else runs them since the CodeBuild lanes that once preinstalled the
+# provider were retired 2026-08-10).
+#
+# The tests are self-contained by construction: each loads its source module by file path
+# and stubs boto3 via sys.modules, so they collect and pass with no AWS SDK and no live
+# account (the end-to-end ambient-IAM path is out of scope for unit CI). uv provides the
+# >=3.14 interpreter the providers require and pytest via --with.
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+# Explicit least-privilege GITHUB_TOKEN (CodeQL actions/missing-workflow-permissions).
+permissions:
+  contents: read
+
+jobs:
+  aws-secrets-source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+      - name: Run aws_secrets_source unit suite
+        working-directory: aws_secrets_source
+        run: uv run --python 3.14 --with pytest python -m pytest tests/ -v
