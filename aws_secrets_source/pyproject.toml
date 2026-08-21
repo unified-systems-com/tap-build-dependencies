@@ -12,9 +12,9 @@
 # secret, and this preinstall wiring is dormant until a secret-gated consumer returns.
 [project]
 name = "aws-secrets-source"
-version = "0.1.0"
 description = "TAP secret source: AWS Secrets Manager (a tap.secret_sources provider; not a grid plugin)."
 requires-python = ">=3.14"
+dynamic = ["version"]
 dependencies = ["boto3>=1.34"]
 
 # The one thing this distribution contributes. Discovered from distribution metadata by
@@ -24,8 +24,32 @@ dependencies = ["boto3>=1.34"]
 aws_secrets_manager = "aws_secrets_source.source:AwsSecretsManagerSource"
 
 [build-system]
-requires = ["hatchling"]
+requires = ["hatchling", "hatch-vcs"]
 build-backend = "hatchling.build"
+
+# The release tag is the single version authority (org convention,
+# req-cicd-release-artifacts in TAP core's spec-cicd-hardening.md). Multi-project
+# repo, so tags carry the DIST NAME prefix — aws-secrets-source-vX.Y.Z — and the
+# --match filter keeps this project's version from ever deriving off a sibling
+# project's tag. setuptools-scm's default tag regex strips the name prefix natively.
+[tool.hatch.version]
+source = "vcs"
+
+[tool.hatch.version.raw-options]
+# The git root is one level up from this project dir; explicit (not
+# search_parent_directories) so a layout change fails the build loudly instead
+# of deriving from whatever repo happens to enclose it.
+root = ".."
+fallback_version = "0.0.0"
+git_describe_command = [
+    "git",
+    "describe",
+    "--dirty",
+    "--tags",
+    "--long",
+    "--match",
+    "aws-secrets-source-v*",
+]
 
 [tool.hatch.build.targets.wheel]
 only-include = ["aws_secrets_source"]
