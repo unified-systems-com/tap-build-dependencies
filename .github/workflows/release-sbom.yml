@@ -1,0 +1,41 @@
+# Release SBOM + attestations for this repo's distributions — thin caller of
+# TAP core's reusable release lane (req-cicd-sbom-10 / req-cicd-release-artifacts).
+#
+# Multi-project repo: release tags carry the DISTRIBUTION NAME prefix,
+# <dist-name>-vX.Y.Z (the org tag grammar, req-cicd-release-artifacts-1 in core's
+# spec-cicd-hardening.md) — one tag filter + one job per released dist. The
+# reusable workflow builds the wheel at the tag (hatch-vcs derives the version
+# FROM the tag), generates the declared SBOM (CycloneDX + SPDX, fail-closed
+# identity/conformance gates keyed on dist name + exact version), and attests
+# wheel provenance + both SBOM predicates. Verify a released wheel:
+#   gh attestation verify <wheel> --owner unified-systems-com
+#   gh attestation verify <wheel> --owner unified-systems-com \
+#     --predicate-type https://cyclonedx.org/bom
+# workflow_dispatch exists for pilot/backfill runs at an existing tag ref
+# (pass expected_version explicitly).
+name: release-sbom
+
+on:
+  push:
+    tags: ["aws-secrets-source-v[0-9]*"]
+  workflow_dispatch:
+    inputs:
+      expected_version:
+        description: "Release version WITHOUT the v prefix (backfill runs at a tag ref)."
+        required: false
+        type: string
+        default: ""
+
+permissions: {}
+
+jobs:
+  aws-secrets-source:
+    permissions:
+      contents: read
+      id-token: write
+      attestations: write
+    uses: unified-systems-com/tap/.github/workflows/plugin-release-sbom.yml@main
+    with:
+      dist_name: aws-secrets-source
+      project_dir: aws_secrets_source
+      expected_version: ${{ inputs.expected_version || '' }}
