@@ -3,9 +3,9 @@
 The distribution is not installed in most stacks, so the module is loaded by file path
 and boto3 is stubbed via ``sys.modules`` — the tests therefore collect and pass in any
 lane without the AWS SDK or a live AWS account. The end-to-end path (ambient IAM →
-GetSecretValue → git credential) is not covered here and is not currently exercised by any
-CI lane — the CodeBuild samsite lane that once did was retired (2026-08-10), and no free-
-runner lane resolves a secret (the plugin repos are public); it runs only against live AWS.
+GetSecretValue → git credential) is not covered here, and is exercised by no CI lane at
+all: no lane resolves a secret, because the plugin repos are public. That path runs only
+against live AWS.
 """
 
 from __future__ import annotations

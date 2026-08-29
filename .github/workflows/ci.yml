@@ -5,8 +5,10 @@
 # tier secret-source PROVIDERS — today aws_secrets_source, a `tap.secret_sources`
 # provider that keeps boto3 out of TAP core — each a standalone Python distribution with
 # its own unit suite. This workflow runs those suites on push/PR so a provider change is
-# gated HERE (nothing else runs them since the CodeBuild lanes that once preinstalled the
-# provider were retired 2026-08-10).
+# gated HERE, because nothing downstream runs them: no CI lane resolves a secret today (the
+# plugin repos are public), so the build-time preinstall this provider exists to serve has
+# no live consumer. This repo's two lanes are the whole story — `ci` gates the unit suites,
+# and release-sbom.yml builds, SBOMs and attests a distribution at its release tag.
 #
 # The tests are self-contained by construction: each loads its source module by file path
 # and stubs boto3 via sys.modules, so they collect and pass with no AWS SDK and no live
