@@ -34,7 +34,7 @@ jobs:
       contents: read
       id-token: write
       attestations: write
-    uses: unified-systems-com/tap/.github/workflows/plugin-release-sbom.yml@main
+    uses: unified-systems-com/tap/.github/workflows/plugin-release-sbom.yml@85db0301623125dce548d4be95ece3c5f5bc2c52
     with:
       dist_name: aws-secrets-source
       project_dir: aws_secrets_source
