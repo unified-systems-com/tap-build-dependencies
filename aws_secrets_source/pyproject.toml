@@ -15,7 +15,7 @@ name = "aws-secrets-source"
 description = "TAP secret source: AWS Secrets Manager (a tap.secret_sources provider; not a grid plugin)."
 requires-python = ">=3.14"
 dynamic = ["version"]
-dependencies = ["boto3==1.44.7"]
+dependencies = ["boto3==1.44.13"]
 
 # The one thing this distribution contributes. Discovered from distribution metadata by
 # tap.secret_sources at preboot; the routing token `aws_secrets_manager` is what a secret
